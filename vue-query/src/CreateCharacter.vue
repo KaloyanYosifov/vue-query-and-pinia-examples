@@ -21,7 +21,6 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import CharacterForm from './CharacterForm.vue';
-import { useQueryClient } from '@tanstack/vue-query';
 import useCreateCharacter from './composables/useCreateCharacter.js';
 
 const character = ref({
@@ -31,12 +30,11 @@ const character = ref({
 });
 
 const router = useRouter();
-const queryClient = useQueryClient();
-const { isPending, isError, mutateAsync } = useCreateCharacter();
+const { isPending, isError, create } = useCreateCharacter();
 const onSubmit = async () => {
   try {
-    await mutateAsync(character.value); // alternative to mutate (usually async is better one if you want to do more stuff)
-    await queryClient.resetQueries({ queryKey: ['characters'] }); // alternatively invalidateQueries can be used
+    await create(character.value);
+
     router.push({
       name: 'home'
     });
