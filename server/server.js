@@ -43,10 +43,12 @@ server.get('/characters', async (request, reply) => {
   const sorted = characters.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const startPage = (page - 1) * limit;
   const endPage = page * limit;
+  const hasMorePages = endPage < sorted.length;
   
   return {
+    hasMorePages,
     data: sorted.slice(startPage, endPage),
-    hasMorePages: endPage < sorted.length,
+    nextPage: hasMorePages ? page + 1 : null,
   };
 });
 

@@ -1,25 +1,23 @@
 import axios from 'axios';
 import { computed } from 'vue';
-import { toRef } from '@vueuse/core';
-import { useQuery } from '@tanstack/vue-query';
+import { useInfiniteQuery } from '@tanstack/vue-query';
+import { startTimeout } from '../utils.js';
 
-export default function useFetchCharacters({
-    page = 1,
-} = {}) {
-    const pageToUse = toRef(page);
-    
-    const opts = useQuery({
-        queryKey: ['characters', pageToUse],
-        async queryFn() {
-            const response = await axios.get(`http://localhost:3000/characters?page=${pageToUse.value}`);
+export default function useFetchCharacters() {
+    const opts = useInfiniteQuery({
+        queryKey: ['characters'],
+        async queryFn({ pageParam = 1 }) {
+            const response = await axios.get(`http://localhost:3000/characters?page=${pageParam}`);
+            
+            await startTimeout(1000);
             
             return response.data;
-        }
+        },
+        getNextPageParam: (lastPage) => lastPage.nextPage,
     });
     
     return {
         ...opts,
-        data: computed(() => opts.data.value.data),
-        hasMorePages: computed(() => opts.data.value.hasMorePages),
+        characters: computed(() => opts.data.value.pages.map(page => page.data).flat()),
     }
 }

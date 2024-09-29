@@ -36,18 +36,16 @@
       />
     </div>
 
-    <button
-        type="submit"
-        class="w-full bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded hover:bg-yellow-300 transition duration-300"
-    >
+    <Button type="submit" class="w-full">
       <slot name="button-label"/>
-    </button>
+    </Button>
   </form>
 </template>
 
 <script setup>
 import { ref, defineProps, defineEmits } from 'vue';
 import { useVModel } from '@vueuse/core';
+import Button from './Button.vue';
 
 const props = defineProps({
   character: {
