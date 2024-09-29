@@ -2,12 +2,22 @@ import axios from 'axios';
 import { computed } from 'vue';
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { startTimeout } from '../utils.js';
+import { toRef } from '@vueuse/core';
 
-export default function useFetchCharacters() {
+export default function useFetchCharacters({ planet = null }) {
+    const planetToUse = toRef(planet);
     const opts = useInfiniteQuery({
-        queryKey: ['characters'],
+        queryKey: ['characters', planetToUse],
+        refetchOnWindowFocus: true,
         async queryFn({ pageParam = 1 }) {
-            const response = await axios.get(`http://localhost:3000/characters?page=${pageParam}`);
+            const url = new URL('http://localhost:3000/characters');
+            url.searchParams.set('page', pageParam);
+            
+            if (planetToUse.value) {
+                url.searchParams.set('planet', planetToUse.value);
+            }
+            
+            const response = await axios.get(url.toString());
             
             await startTimeout(1000);
             

@@ -46,11 +46,16 @@ const findCharacterById = (id) => characters.find((character) => character.id ==
 
 // List all characters
 server.get('/characters', async (request, reply) => {
+    const planet = request.query.planet;
     const page = Number(request.query?.page || 1);
     const limit = Number(request.query?.limit || 3);
-    const sorted = characters.toSorted((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    const startPage = (
-        page - 1) * limit;
+    let sorted = characters.toSorted((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    if (planet) {
+        sorted = sorted.filter(c => c.planet === planet);
+    }
+    
+    const startPage = (page - 1) * limit;
     const endPage = page * limit;
     const hasMorePages = endPage < sorted.length;
     
@@ -156,5 +161,10 @@ const start = async () => {
         process.exit(1);
     }
 };
+
+// List all planets
+server.get('/planets', async (request, reply) => {
+    return [...new Set([...characters.map(character => character.planet)])];
+});
 
 start();
