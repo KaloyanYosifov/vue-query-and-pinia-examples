@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { computed } from 'vue';
 import { toRef } from '@vueuse/core';
 import { useQuery } from '@tanstack/vue-query';
 
@@ -7,7 +8,7 @@ export default function useFetchCharacters({
 } = {}) {
     const pageToUse = toRef(page);
     
-    return useQuery({
+    const opts = useQuery({
         queryKey: ['characters', pageToUse],
         async queryFn() {
             const response = await axios.get(`http://localhost:3000/characters?page=${pageToUse.value}`);
@@ -15,4 +16,10 @@ export default function useFetchCharacters({
             return response.data;
         }
     });
+    
+    return {
+        ...opts,
+        data: computed(() => opts.data.value.data),
+        hasMorePages: computed(() => opts.data.value.hasMorePages),
+    }
 }

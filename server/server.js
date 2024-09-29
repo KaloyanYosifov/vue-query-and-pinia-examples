@@ -12,17 +12,42 @@ server.register(cors, {
 
 // Mock data for Star Wars characters
 let characters = [
-  { id: 1, name: 'Luke Skywalker', role: 'Jedi', planet: 'Tatooine' },
-  { id: 2, name: 'Darth Vader', role: 'Sith Lord', planet: 'Tatooine' },
-  { id: 3, name: 'Leia Organa', role: 'Princess', planet: 'Alderaan' },
+  {  name: 'Luke Skywalker', role: 'Jedi', planet: 'Tatooine' },
+  {  name: 'Darth Vader', role: 'Sith Lord', planet: 'Tatooine' },
+  {  name: 'Darth Sidious', role: 'Sith Lord', planet: 'Naboo' },
+  {  name: 'Sheev Palpatine', role: 'Chancellor', planet: 'Naboo' },
+  {  name: 'Padme Amidala', role: 'Senator', planet: 'Naboo' },
+  {  name: 'Leia Organa', role: 'Princess', planet: 'Alderaan' },
+  {  name: 'Obi-Wan Kenobi', role: 'Jedi', planet: 'Stewjon' },
+  {  name: 'Mace Windu', role: 'Jedi', planet: 'Haruun Kal' },
+  {  name: 'Yoda', role: 'Jedi', planet: 'Mysterious' },
+  {  name: 'Anakin Skywalker', role: 'Jedi', planet: 'Tatooine' },
+  {  name: 'Chewbacca', role: 'Jedi', planet: 'Kashyyyk' },
+  {  name: 'R2-D2', role: 'Robot', planet: 'Naboo' },
+  {  name: 'C-3PO', role: 'Robot', planet: 'Tatooine' },
 ];
+
+characters.map((character, id) => ({
+  id: id + 1,
+  createdAt: (new Date()).toISOString(),
+  ...character,
+}))
 
 // Helper function to find a character by ID
 const findCharacterById = (id) => characters.find((character) => character.id === id);
 
 // List all characters
 server.get('/characters', async (request, reply) => {
-  return characters;
+  const page = Number(request.query?.page || 1);
+  const limit = Number(request.query?.limit || 3);
+  const sorted = characters.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const startPage = (page - 1) * limit;
+  const endPage = page * limit;
+  
+  return {
+    data: sorted.slice(startPage, endPage),
+    hasMorePages: endPage < sorted.length,
+  };
 });
 
 // Fetch a single character by ID
@@ -51,6 +76,7 @@ server.post('/characters', async (request, reply) => {
     name,
     role,
     planet,
+    createdAt: (new Date()).toISOString(),
   };
 
   characters.push(newCharacter);
