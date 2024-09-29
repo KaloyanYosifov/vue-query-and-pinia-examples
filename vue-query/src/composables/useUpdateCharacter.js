@@ -17,6 +17,7 @@ export default function useUpdateCharacter() {
     const update = async (character) => {
         await opts.mutateAsync(character); // alternative to mutate (usually async is better one if you want to do more stuff)
         await queryClient.resetQueries({ queryKey: ['characters'] }); // alternatively invalidateQueries can be used
+        await queryClient.resetQueries({ queryKey: ['characters', character.id] });
     };
     
     return {
