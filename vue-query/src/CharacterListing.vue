@@ -40,7 +40,7 @@
 import useFetchCharacters from './composables/useFetchCharacters.js';
 import CharacterListItem from './CharacterListItem.vue';
 import Button from './Button.vue';
-import Loader from './composables/Loader.vue';
+import Loader from './Loader.vue';
 
 const {
   isPending,
